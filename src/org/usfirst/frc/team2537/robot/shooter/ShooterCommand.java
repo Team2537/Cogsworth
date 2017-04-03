@@ -27,11 +27,16 @@ public class ShooterCommand extends Command {
 
 	@Override
 	protected void execute() {
+		if(shooterLock == true){
+			Robot.shooterSys.setShooterNeutral();
+		} else {
+			Robot.shooterSys.setShooterSmallReleased();
+		}
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return true;
+		return false;
 	}
 
 	@Override
