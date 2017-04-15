@@ -2,17 +2,15 @@ package org.usfirst.frc.team2537.robot;
 
 //github.com/Team2537/Cogsworth.git
 import org.usfirst.frc.team2537.robot.auto.AutoChooser;
+import org.usfirst.frc.team2537.robot.auto.VisionRotate;
 import org.usfirst.frc.team2537.robot.cameras.Cameras;
 import org.usfirst.frc.team2537.robot.climber.ClimberSubsystem;
 import org.usfirst.frc.team2537.robot.drive.DriveSubsystem;
 import org.usfirst.frc.team2537.robot.input.HumanInput;
-import org.usfirst.frc.team2537.robot.testing.ClimberTest;
-import org.usfirst.frc.team2537.robot.testing.NavXTest;
-import org.usfirst.frc.team2537.robot.testing.RPiTest;
-import org.usfirst.frc.team2537.robot.testing.TestFramework;
-import org.usfirst.frc.team2537.robot.testing.UltrasonicTest;
-import org.usfirst.frc.team2537.robot.testing.WheelTest;
+import org.usfirst.frc.team2537.robot.testing.*;
+import org.usfirst.frc.team2537.robot.shooter.ShooterSubsystem;
 import org.usfirst.frc.team2537.robot.vision.PISubsystem;
+import org.usfirst.frc.team2537.robot.vision.RPiCalibration;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -30,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	public static DriveSubsystem driveSys;
 	public static ClimberSubsystem climberSys;
+	public static ShooterSubsystem shooterSys;
 	public static PowerDistributionPanel pdp;
 	public static Cameras cameras;
 	public static PISubsystem piSys;
@@ -49,6 +48,9 @@ public class Robot extends IterativeRobot {
 		cameras = new Cameras();
 		cameras.start();
 		
+		shooterSys = new ShooterSubsystem();
+		shooterSys.registerButtons();
+		
 		piSys = new PISubsystem();
 		piSys.initDefaultCommand();
 		
@@ -56,8 +58,9 @@ public class Robot extends IterativeRobot {
 		
 		autoChooser = new AutoChooser();
 		SmartDashboard.putData("Auto Choices", autoChooser);
+		SmartDashboard.putData("Reclibrate RPi", new RPiCalibration());
+		SmartDashboard.putNumber("RPi Target Duty Cycle", VisionRotate.TARGET_DUTY_CYCLE);
 	}
-	
 
 	/**
 	 * This function is called periodically during autonomous
@@ -65,6 +68,8 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		Scheduler.getInstance().removeAll();
 		Scheduler.getInstance().add(autoChooser.getSelected());
+		driveSys.resetEncoders();
+		driveSys.getAhrs().reset();
 		System.out.println("Autonomous start");
 	}
 
@@ -83,6 +88,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		//System.out.println(Robot.driveSys.rencoder.getRaw());
+		SmartDashboard.putNumber("RPi Current Duty Cycle", piSys.getDutyCycle());
+		SmartDashboard.putNumber("NavX Angle", driveSys.getAhrs().getAngle());
+		SmartDashboard.putNumber("Ultrasonic value: ", driveSys.ultraSanic.getRangeInches());
 		Scheduler.getInstance().run();
 	}
 
@@ -121,10 +129,16 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		driveSys.getAhrs().reset();
+		SmartDashboard.putNumber("RPi Current Duty Cycle", piSys.getDutyCycle());
 	}
 	
 	@Override
 	public void disabledPeriodic() {
+		SmartDashboard.putNumber("RPi Current Duty Cycle", piSys.getDutyCycle());
+		SmartDashboard.putNumber("RPi Target Duty Cycle", VisionRotate.TARGET_DUTY_CYCLE);
+		SmartDashboard.putNumber("NavX Angle", driveSys.getAhrs().getAngle());
+		SmartDashboard.putNumber("Ultrasonic value: ", driveSys.ultraSanic.getRangeInches());
+		Scheduler.getInstance().run();
 	}
 
 }

@@ -6,6 +6,7 @@ import org.usfirst.frc.team2537.robot.drive.DriveSubsystem;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Front wheels are SRX Talons
@@ -30,16 +31,16 @@ public class DriveStraightCommand extends Command {
 	/* the robot begins to turn when the angle is greater than this constant */
 	private static final double NAVX_CORRECTION_DEGREE_TOLERANCE = 1;
 	/* add @code{DISTANCE_STOP_CORRECTION} inches to distance because the robot consistently stops this many inches early */
-	private static final double DISTANCE_STOP_CORRECTION = 3;
+	private static final double DISTANCE_STOP_CORRECTION = 0;
 	
     public DriveStraightCommand(double distance) {
     	requires(Robot.driveSys);
     	targetTicks = (distance + DISTANCE_STOP_CORRECTION) * DriveSubsystem.ticksPerInch;
-    	System.out.println("[DriveStraightCommand] target ticks: " + targetTicks);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	System.out.println("[DriveStraightCommand] target ticks: " + targetTicks);
     	Robot.driveSys.resetEncoders();
     	Robot.driveSys.getAhrs().reset();
     	Robot.driveSys.setMode(TalonControlMode.Position);
@@ -50,11 +51,13 @@ public class DriveStraightCommand extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	double angle = Robot.driveSys.getAhrs().getAngle();
-    	/* convert angle domain from [0,359] to [-180,180] */
+    	/* convert angle domain from [0,360] to [-180,180] */
     	if(angle > 180){
     		angle -= 360;
+    	} else if(angle < -180){
+    		angle += 360;
     	}
-    	System.out.println("[DriveStraightCommand] angle: " + angle);
+//    	System.out.println("[DriveStraightCommand] angle: " + angle);
     	/* set the back wheels to a speed proportional to the front wheel speeds
     	 * the front wheels are set by a PID loop */
     	double backLeftWheelSpeed = ((targetTicks - Robot.driveSys.getEncoderAverage()) / targetTicks) * BACK_WHEEL_SPEED_PROPORTION;
@@ -67,8 +70,12 @@ public class DriveStraightCommand extends Command {
     		backRightWheelSpeed -= correction;
     		backLeftWheelSpeed -= correction;
     	}
+    	SmartDashboard.putNumber("[DriveStraightCommand] target ticks", targetTicks);
+    	SmartDashboard.putNumber("[DriveStraightCommand] encoder average", Robot.driveSys.getEncoderAverage());
+    	SmartDashboard.putNumber("[DriveStraightCommand] left ticks", Robot.driveSys.getLeftEncoders());
+    	SmartDashboard.putNumber("[DriveStraightCommand] right ticks", Robot.driveSys.getRightEncoders());
     	Robot.driveSys.setBackMotors(backLeftWheelSpeed, backRightWheelSpeed);
-    	System.out.println("[DriveForwardCommand] Encoder Position: " + Robot.driveSys.getEncoderAverage());
+//    	System.out.println("[DriveForwardCommand] Encoder Position: " + Robot.driveSys.getEncoderAverage());
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -78,10 +85,12 @@ public class DriveStraightCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	System.out.println("[DriveForwardCommand] finished");
+    	System.out.println("[DriveForwardCommand] finished. Ticks: " + Robot.driveSys.getEncoderAverage());
     	Robot.driveSys.setMode(TalonControlMode.PercentVbus);
 		Robot.driveSys.setDriveMotors(0);
+		/* we disable and then enable the motors to kill the PID loop */
     	Robot.driveSys.disableMotors();
+    	Robot.driveSys.enableMotors();
     	Robot.driveSys.resetEncoders();
     }
 

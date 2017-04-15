@@ -3,7 +3,6 @@ package org.usfirst.frc.team2537.robot.auto;
 import org.usfirst.frc.team2537.robot.Robot;
 
 import com.ctre.CANTalon.TalonControlMode;
-import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -12,8 +11,8 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RotateCommand extends Command {
 	private double targetAngle;
-	private static final double DEFAULT_SPEED = 1.0;
-	private static final double REDUCED_SPEED = 0.7;
+	private static final double DEFAULT_SPEED = 0.75;
+	private static final double REDUCED_SPEED = 0.5;
 	private static final double TOLERANCE = 1; // degrees
 	private static final int SLOW_DOWN_ANGLE = 10;
 	private double currentAngle;
@@ -21,9 +20,6 @@ public class RotateCommand extends Command {
     	requires(Robot.driveSys);
     	Robot.driveSys.getAhrs().reset();
     	targetAngle = angle;
-    	if(targetAngle > 180){
-    		targetAngle -= 360;
-    	}
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     }
@@ -39,6 +35,8 @@ public class RotateCommand extends Command {
     	currentAngle=Robot.driveSys.getAhrs().getAngle();
     	if(currentAngle > 180){
     		currentAngle -= 360;
+    	} else if (currentAngle < -180) {
+    		currentAngle += 360;
     	}
     	double speed = DEFAULT_SPEED;
     	if (Math.abs(currentAngle-targetAngle) < SLOW_DOWN_ANGLE) { //reduces speed if angle is close to finishing angle

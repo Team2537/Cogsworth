@@ -21,7 +21,12 @@ public class NavXTest extends TestCommand {
 
 	@Override
 	public Double getSensor() {
-		return Robot.driveSys.getAhrs().getAngle();
+		double angle = Robot.driveSys.getAhrs().getAngle();
+		if(angle > 180){
+    		angle -= 360;
+    	} else if (angle < -180) {
+    		angle += 360;
+    	}
+		return angle;
 	}
-
 }

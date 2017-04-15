@@ -9,8 +9,11 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class ClimberSubsystem extends Subsystem {
 
 	private Talon climberMotor1 = new Talon(Ports.CLIMBER_MOTOR_ONE); // creates motor for climber
+	private Talon climberMotor2 = new Talon(Ports.CLIMBER_MOTOR_TWO);
 	protected static final double SPEED_MULTIPLIER = 1; // Direct multiplier (set speed * this variable)
-
+	protected static final double GROUND_AMPERAGE_THRESHOLD = 20;
+	protected static final double AIR_AMPERAGE_CUTOFF = 40;
+	
 	public ClimberSubsystem() {
 	}
 
@@ -19,7 +22,7 @@ public class ClimberSubsystem extends Subsystem {
 	}
 
 	public void registerButtons() { 
-		HumanInput.registerWhenPressedCommand(HumanInput.climberActivateButton, new ClimberCommand());
+		HumanInput.climberSlowActivateButton.whenPressed(new ClimberCommand());
 		HumanInput.registerWhenPressedCommand(HumanInput.climberKillSwitch, new ClimberKillCommand());
 	}
 
@@ -29,5 +32,6 @@ public class ClimberSubsystem extends Subsystem {
 	 */
 	public void setClimberMotor(double speed) {
 		climberMotor1.set(speed * SPEED_MULTIPLIER);
+		climberMotor2.set(speed * SPEED_MULTIPLIER);
 	}
 }
