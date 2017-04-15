@@ -5,6 +5,13 @@ import org.usfirst.frc.team2537.robot.auto.AutoChooser;
 import org.usfirst.frc.team2537.robot.cameras.Cameras;
 import org.usfirst.frc.team2537.robot.climber.ClimberSubsystem;
 import org.usfirst.frc.team2537.robot.drive.DriveSubsystem;
+import org.usfirst.frc.team2537.robot.input.HumanInput;
+import org.usfirst.frc.team2537.robot.testing.ClimberTest;
+import org.usfirst.frc.team2537.robot.testing.NavXTest;
+import org.usfirst.frc.team2537.robot.testing.RPiTest;
+import org.usfirst.frc.team2537.robot.testing.TestFramework;
+import org.usfirst.frc.team2537.robot.testing.UltrasonicTest;
+import org.usfirst.frc.team2537.robot.testing.WheelTest;
 import org.usfirst.frc.team2537.robot.vision.PISubsystem;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -25,9 +32,11 @@ public class Robot extends IterativeRobot {
 	public static ClimberSubsystem climberSys;
 	public static PowerDistributionPanel pdp;
 	public static Cameras cameras;
-
 	public static PISubsystem piSys;
+	
 	private SendableChooser<Command> autoChooser;
+	
+	private TestFramework testSys;
 	
 	@Override
 	public void robotInit() {
@@ -88,6 +97,16 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void testInit() {
+		testSys.initTestFramework("SmartPitSys", 5805);
+		testSys.registerTestCommand(new WheelTest(true, false), 5000d, "Left Wheels Forwards Test");
+		testSys.registerTestCommand(new WheelTest(false, false), 5000d, "Right Wheels Forwards Test");
+		testSys.registerTestCommand(new WheelTest(true, true), 5000d, "Left Wheels Backwards Test");
+		testSys.registerTestCommand(new WheelTest(false, true), 5000d, "Right Wheels Backwards Test");
+		testSys.registerTestCommand(new ClimberTest(false), 5000d, "Slow Speed Climber Test");
+		testSys.registerTestCommand(new ClimberTest(true), 5000d, "Fast Speed Backwards Test");
+		testSys.registerTestCommand(new NavXTest(), HumanInput.cameraSwitchButton, "NavX Test");
+		testSys.registerTestCommand(new RPiTest(), HumanInput.cameraSwitchButton, "RPi Test");
+		testSys.registerTestCommand(new UltrasonicTest(), HumanInput.cameraSwitchButton, "Ultrasonic Test");
 	}
 
 	@Override
@@ -95,7 +114,8 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during test mode
 	 */
 	public void testPeriodic() {
-		Scheduler.getInstance().run();
+		testSys.run();
+		testSys.finish();
 	}
 
 	@Override

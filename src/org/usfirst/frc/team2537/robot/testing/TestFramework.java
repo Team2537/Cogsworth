@@ -15,20 +15,36 @@ public class TestFramework {
 	
 	LinkedList<TestNode> testCommands = new LinkedList<TestNode>();
 	
-	public void initTestFramework(String SPSHostName, int SPSPortNum) throws UnknownHostException, IOException {
-		statusSocket = new Socket(SPSHostName, SPSPortNum);
-		statusWriter = new PrintWriter(statusSocket.getOutputStream(), true);
+	public void initTestFramework(String SPSHostName, int SPSPortNum) {
+		try {
+			statusSocket = new Socket(SPSHostName, SPSPortNum);
+		} catch (UnknownHostException e) {
+			System.out.println("Smart pit system hostname not found!");
+		} catch (IOException e) {
+			System.out.println("Error connecting to the smart pit system");
+		}
+		try {
+			statusWriter = new PrintWriter(statusSocket.getOutputStream(), true);
+		} catch (IOException e) {
+			e.printStackTrace(); // This should never happen but
+		}
 	}
 	
-	public void registerTestCommand(TestCommand c, Double time, Button b, String testName) {
-		testCommands.add(new TestNode(c, time, b, testName));
+	public void registerTestCommand(TestCommand c, Button b, String testName) {
+		testCommands.add(new TestNode(c, b, testName));
+	}
+	
+	public void registerTestCommand(TestCommand c, Double time, String testName) {
+		testCommands.add(new TestNode(c, time, testName));
 	}
 	
 	private void sendMessage(String testName, Double sensorVal) {
-		statusWriter.println("[" + sensorVal == null ? "2" : "3"  + "]" + testName + ":" + sensorVal == null ? sensorVal : "");
+		statusWriter.println("[" + sensorVal == null ? "1" : "2"  + "]" + 
+				testName + 
+				":" + sensorVal == null ? sensorVal : "" );
 	}
 	
-	public void run() throws IllegalArgumentException, InterruptedException {
+	public void run() {
 		for (TestNode tn : testCommands) {
 			tn.c.initialize();
 			if (tn.time != null) {
@@ -47,12 +63,20 @@ public class TestFramework {
 			} else {
 				throw new IllegalArgumentException("Test Command " + tn.testName + " has neither a time limit or a finish button.");
 			}
-			Thread.sleep(1000);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public void finish() throws IOException {
-		statusSocket.close();
+	public void finish() {
+		try {
+			statusSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace(); // This shouldn't really happen either but lol
+		}
 		statusWriter.close();
 	}
 }

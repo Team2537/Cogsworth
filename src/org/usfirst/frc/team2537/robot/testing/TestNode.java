@@ -8,10 +8,17 @@ public class TestNode {
 	public Button b;
 	public String testName;
 	
-	public TestNode(TestCommand c, Double time, Button b, String testName) {
+	public TestNode(TestCommand c, Button b, String testName) {
+		this.c = c;
+		this.time = null;
+		this.b = b;
+		this.testName = testName;
+	}
+	
+	public TestNode(TestCommand c, Double time, String testName) {
 		this.c = c;
 		this.time = time;
-		this.b = b;
+		this.b = null;
 		this.testName = testName;
 	}
 }

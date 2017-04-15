@@ -1,6 +1,8 @@
 package org.usfirst.frc.team2537.robot.testing;
 
-public abstract class TestCommand {
+import edu.wpi.first.wpilibj.command.Command;
+
+public abstract class TestCommand extends Command {
 	public abstract void initialize();
 	
 	public abstract void execute();
@@ -8,4 +10,12 @@ public abstract class TestCommand {
 	public abstract void end();
 	
 	public abstract Double getSensor();
+	
+	public boolean isFinished() {
+		return true;
+	}
+	
+	public void interrupted() {
+		
+	}
 }
