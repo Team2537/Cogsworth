@@ -32,8 +32,8 @@ public class WheelTest extends TestCommand {
 	}
 
 	@Override
-	public Double getSensor() {
-		return left ? Robot.driveSys.getLeftEncoders() : Robot.driveSys.getRightEncoders();
+	public String getSensor() {
+		return left ? "Left encoder: " + Robot.driveSys.getLeftEncoders() : "Right encoder: " + Robot.driveSys.getRightEncoders();
 	}
 
 }

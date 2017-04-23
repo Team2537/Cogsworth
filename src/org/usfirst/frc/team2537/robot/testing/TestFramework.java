@@ -1,63 +1,58 @@
 package org.usfirst.frc.team2537.robot.testing;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class TestFramework {
 	
-	private Socket statusSocket;
-	private PrintWriter statusWriter;
+	NetworkTable table;
 	
 	LinkedList<TestNode> testCommands = new LinkedList<TestNode>();
 	
-	public void initTestFramework(String SPSHostName, int SPSPortNum) {
-		try {
-			statusSocket = new Socket(SPSHostName, SPSPortNum);
-		} catch (UnknownHostException e) {
-			System.out.println("Smart pit system hostname not found!");
-		} catch (IOException e) {
-			System.out.println("Error connecting to the smart pit system");
-		}
-		try {
-			statusWriter = new PrintWriter(statusSocket.getOutputStream(), true);
-		} catch (IOException e) {
-			e.printStackTrace(); // This should never happen but
-		}
+	public boolean finished = false;
+	
+	public TestFramework() {
+		table = NetworkTable.getTable("SmartPitSystem");
+		table.putString("Test Name", "Connected");
+		table.putString("Sensor Value", "Connected");
+		table.putString("Remaining", "Connected");
 	}
 	
 	public void registerTestCommand(TestCommand c, Button b, String testName) {
+		if (finished) return;
 		testCommands.add(new TestNode(c, b, testName));
 	}
 	
 	public void registerTestCommand(TestCommand c, Double time, String testName) {
+		if (finished) return;
 		testCommands.add(new TestNode(c, time, testName));
 	}
 	
-	private void sendMessage(String testName, Double sensorVal) {
-		statusWriter.println("[" + sensorVal == null ? "1" : "2"  + "]" + 
-				testName + 
-				":" + sensorVal == null ? sensorVal : "" );
+	private void sendMessage(String testName, String sensorVal, String remainingCondition) {
+		table.putString("Test Name", testName);
+		table.putString("Sensor Value", sensorVal);
+		table.putString("Remaining", remainingCondition);
+		if (finished) return;
+
 	}
 	
 	public void run() {
+		if (finished) return;
 		for (TestNode tn : testCommands) {
 			tn.c.initialize();
 			if (tn.time != null) {
 				double startTime = System.currentTimeMillis();
 				while (System.currentTimeMillis() < startTime + tn.time * 1000) {
 					tn.c.execute();
-					sendMessage(tn.testName, tn.c.getSensor());
+					sendMessage(tn.testName, tn.c.getSensor(), "Time remaining: " + Double.toString(((startTime + tn.time * 1000) - System.currentTimeMillis())/1000));
 				}
 				tn.c.end();
 			} else if (tn.b != null) {
 				while (!tn.b.get()) {
 					tn.c.execute();
-					sendMessage(tn.testName, tn.c.getSensor());
+					sendMessage(tn.testName, tn.c.getSensor(), "Press button to continue");
 				}
 				tn.c.end();
 			} else {
@@ -72,11 +67,15 @@ public class TestFramework {
 	}
 	
 	public void finish() {
-		try {
-			statusSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace(); // This shouldn't really happen either but lol
-		}
-		statusWriter.close();
+		table.putString("Test Name", "Testing finished!");
+		table.putString("Sensor Value", "No Sensor");
+		table.putString("Remaining", "Testing finished!");
+		finished = true;
+	}
+	
+	public void disabled() {
+		table.putString("Test Name", "Connected");
+		table.putString("Sensor Value", "Connected");
+		table.putString("Remaining", "Connected");
 	}
 }

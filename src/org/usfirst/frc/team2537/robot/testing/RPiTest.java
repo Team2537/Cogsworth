@@ -20,8 +20,8 @@ public class RPiTest extends TestCommand {
 	}
 
 	@Override
-	public Double getSensor() {
-		return Robot.piSys.getDutyCycle();
+	public String getSensor() {
+		return "RPi Duty Cycle: " + Robot.piSys.getDutyCycle();
 	}
 
 }

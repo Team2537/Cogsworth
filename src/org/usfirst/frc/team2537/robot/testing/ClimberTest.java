@@ -26,8 +26,8 @@ public class ClimberTest extends TestCommand {
 	}
 
 	@Override
-	public Double getSensor() {
-		return null;
+	public String getSensor() {
+		return "No Sensor";
 	}
 
 }

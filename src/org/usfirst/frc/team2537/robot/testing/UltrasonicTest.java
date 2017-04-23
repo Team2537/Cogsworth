@@ -20,8 +20,8 @@ public class UltrasonicTest extends TestCommand {
 	}
 
 	@Override
-	public Double getSensor() {
-		return Robot.driveSys.ultraSanic.getRangeInches();
+	public String getSensor() {
+		return "Ultrasonic: " + Robot.driveSys.ultraSanic.getRangeInches();
 	}
 
 }

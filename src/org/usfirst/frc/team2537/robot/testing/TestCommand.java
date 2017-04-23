@@ -9,7 +9,7 @@ public abstract class TestCommand extends Command {
 	
 	public abstract void end();
 	
-	public abstract Double getSensor();
+	public abstract String getSensor();
 	
 	public boolean isFinished() {
 		return true;

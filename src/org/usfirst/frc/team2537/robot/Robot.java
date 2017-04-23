@@ -105,7 +105,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void testInit() {
-		testSys.initTestFramework("SmartPitSys", 5805);
+		testSys.finished = false;
 		testSys.registerTestCommand(new WheelTest(true, false), 5000d, "Left Wheels Forwards Test");
 		testSys.registerTestCommand(new WheelTest(false, false), 5000d, "Right Wheels Forwards Test");
 		testSys.registerTestCommand(new WheelTest(true, true), 5000d, "Left Wheels Backwards Test");
@@ -130,6 +130,7 @@ public class Robot extends IterativeRobot {
 	public void disabledInit() {
 		driveSys.getAhrs().reset();
 		SmartDashboard.putNumber("RPi Current Duty Cycle", piSys.getDutyCycle());
+		testSys.disabled();
 	}
 	
 	@Override
