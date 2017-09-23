@@ -7,8 +7,13 @@ import org.usfirst.frc.team2537.robot.cameras.Cameras;
 import org.usfirst.frc.team2537.robot.climber.ClimberSubsystem;
 import org.usfirst.frc.team2537.robot.drive.DriveSubsystem;
 import org.usfirst.frc.team2537.robot.input.HumanInput;
-import org.usfirst.frc.team2537.robot.testing.*;
 import org.usfirst.frc.team2537.robot.shooter.ShooterSubsystem;
+import org.usfirst.frc.team2537.robot.testing.ClimberTest;
+import org.usfirst.frc.team2537.robot.testing.NavXTest;
+import org.usfirst.frc.team2537.robot.testing.RPiTest;
+import org.usfirst.frc.team2537.robot.testing.TestFramework;
+import org.usfirst.frc.team2537.robot.testing.UltrasonicTest;
+import org.usfirst.frc.team2537.robot.testing.WheelTest;
 import org.usfirst.frc.team2537.robot.vision.PISubsystem;
 import org.usfirst.frc.team2537.robot.vision.RPiCalibration;
 
@@ -56,6 +61,8 @@ public class Robot extends IterativeRobot {
 		
 		pdp = new PowerDistributionPanel();
 		
+		testSys = new TestFramework();
+		
 		autoChooser = new AutoChooser();
 		SmartDashboard.putData("Auto Choices", autoChooser);
 		SmartDashboard.putData("Reclibrate RPi", new RPiCalibration());
@@ -78,7 +85,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
+		Scheduler.getInstance().run();
 		
 	}
 
@@ -139,6 +146,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("RPi Target Duty Cycle", VisionRotate.TARGET_DUTY_CYCLE);
 		SmartDashboard.putNumber("NavX Angle", driveSys.getAhrs().getAngle());
 		SmartDashboard.putNumber("Ultrasonic value: ", driveSys.ultraSanic.getRangeInches());
+		SmartDashboard.putNumber("Left Encoder", driveSys.getLeftEncoders());
+		SmartDashboard.putNumber("Right Encoder", driveSys.getRightEncoders());
 		Scheduler.getInstance().run();
 	}
 

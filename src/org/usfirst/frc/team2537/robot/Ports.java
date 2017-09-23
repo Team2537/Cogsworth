@@ -10,7 +10,7 @@ public class Ports {
 	// Mechanism Talon Ports
 	public static final int CLIMBER_MOTOR_ONE = 5, CLIMBER_MOTOR_TWO = 6;
 
-	public static final int SHOOTER_MOTOR = 1;
+	public static final int SHOOTER_MOTOR = 4;
 
 	// Joystick and XBox Ports
 	public static final int LEFT_JOYSTICK = 0, RIGHT_JOYSTICK = 1;

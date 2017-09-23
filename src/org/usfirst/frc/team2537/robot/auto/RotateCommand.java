@@ -11,11 +11,12 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RotateCommand extends Command {
 	private double targetAngle;
-	private static final double DEFAULT_SPEED = 0.75;
-	private static final double REDUCED_SPEED = 0.5;
+	private static double DEFAULT_SPEED = 0.75;
+	private static double REDUCED_SPEED = 0.5;
 	private static final double TOLERANCE = 1; // degrees
 	private static final int SLOW_DOWN_ANGLE = 10;
 	private double currentAngle;
+	
     public RotateCommand(double angle) {
     	requires(Robot.driveSys);
     	Robot.driveSys.getAhrs().reset();
@@ -23,8 +24,14 @@ public class RotateCommand extends Command {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     }
+	
+	public RotateCommand(double angle, double speed) {
+		this(angle);
+		DEFAULT_SPEED = speed;
+		REDUCED_SPEED = speed;
+	}
 
-    // Called just before this Command runs the first time
+	// Called just before this Command runs the first time
     protected void initialize() {
     	Robot.driveSys.getAhrs().reset();
     	Robot.driveSys.setMode(TalonControlMode.PercentVbus);

@@ -8,10 +8,11 @@ import org.usfirst.frc.team2537.robot.input.HumanInput;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class ShooterCommand extends Command {
+public class ShooterClose extends Command {
 	
 	
-	public ShooterCommand() {
+	public ShooterClose() {
+		super(2);
 		requires(Robot.shooterSys);
 	}
 
@@ -21,12 +22,12 @@ public class ShooterCommand extends Command {
 
 	@Override
 	protected void execute() {
-		Robot.shooterSys.setShooterReleased();
+		Robot.shooterSys.setShooterLocked();
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return false;
+		return this.isTimedOut();
 	}
 
 	@Override
